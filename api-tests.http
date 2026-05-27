@@ -1,0 +1,77 @@
+### Nothin API Tests
+### Requires VS Code "REST Client" extension
+### 
+### NOTE: All routes are protected by Clerk authentication.
+### To run these tests locally:
+### 1. Log in to the app in your browser (localhost:3000)
+### 2. Open dev tools, go to Network or Application tab
+### 3. Find the Clerk `__session` cookie and paste its value below
+### 
+@session_cookie = YOUR_CLERK_SESSION_COOKIE_HERE
+@baseUrl = http://localhost:3000/api
+@journalId = YOUR_JOURNAL_ID_HERE
+@entryId = YOUR_ENTRY_ID_HERE
+
+### 1. Create a new entry (POST /api/entries)
+POST {{baseUrl}}/entries
+Content-Type: application/json
+Cookie: __session={{session_cookie}}
+
+{
+  "title": "API Test Entry",
+  "body": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": [{ "type": "text", "text": "This is a test entry from the HTTP client." }]
+      }
+    ]
+  },
+  "mood": "HIGH",
+  "tags": ["api", "test"],
+  "people": ["Alice", "Bob"],
+  "place": "Home Office",
+  "journalId": "{{journalId}}",
+  "entryDate": "2026-05-27T10:00:00Z",
+  "isLocked": false,
+  "isPinned": false
+}
+
+### 2. Get the created entry (GET /api/entries/:id)
+GET {{baseUrl}}/entries/{{entryId}}
+Cookie: __session={{session_cookie}}
+
+### 3. Update the entry (PATCH /api/entries/:id)
+PATCH {{baseUrl}}/entries/{{entryId}}
+Content-Type: application/json
+Cookie: __session={{session_cookie}}
+
+{
+  "title": "Updated API Test Entry",
+  "body": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": [{ "type": "text", "text": "This entry has been updated via PATCH." }]
+      }
+    ]
+  },
+  "mood": "VERY_HIGH",
+  "tags": ["api", "updated"],
+  "people": [],
+  "place": "Home Office",
+  "journalId": "{{journalId}}",
+  "entryDate": "2026-05-27T10:00:00Z",
+  "isLocked": true,
+  "isPinned": true
+}
+
+### 4. Fetch the locked entry (GET /api/entries/:id?unlockCode=123)
+GET {{baseUrl}}/entries/{{entryId}}?unlockCode=123
+Cookie: __session={{session_cookie}}
+
+### 5. Soft-delete the entry (DELETE /api/entries/:id)
+DELETE {{baseUrl}}/entries/{{entryId}}
+Cookie: __session={{session_cookie}}
