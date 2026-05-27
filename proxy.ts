@@ -10,10 +10,9 @@ const isPublicRoute = createRouteMatcher([
   '/sitemap.xml',
 ])
 
-export default clerkMiddleware(async (auth, req) => {  // ← add async
+export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
-    const session = await auth()                        // ← await auth()
-    session.protect()                                   // ← call protect() on the result
+    await auth.protect()   // ← call protect() directly on auth, not on the session
   }
   return NextResponse.next()
 })
