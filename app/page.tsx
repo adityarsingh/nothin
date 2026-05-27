@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { PenTool, Search, Calendar, Lock, ArrowRight, ShieldCheck } from "lucide-react";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { UserButton } from "@clerk/nextjs";
 import PricingSection from "../components/landing/PricingSection";
 
 export const metadata = {
@@ -7,17 +10,24 @@ export const metadata = {
   description: "Nothing to hide. Everything to remember.",
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // Server-side auth check — signed-in users go straight to /today
+  const { userId } = await auth();
+  if (userId) {
+    redirect("/today");
+  }
+
   return (
     <div className="min-h-screen bg-background text-text selection:bg-primary/20 selection:text-primary">
       
-      {/* Navigation */}
+      {/* Navigation — auth-aware (userId is null here, but kept reactive for edge cases) */}
       <nav className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="font-display text-[28px] tracking-tight">Nothin</span>
             <span className="text-[10px] uppercase tracking-widest text-muted font-medium ml-2 hidden sm:inline">Private Sanctuary</span>
           </div>
+          {/* Signed-out nav — userId is guaranteed null past this point */}
           <div className="flex items-center gap-6">
             <Link href="/login" className="text-sm font-medium text-muted hover:text-text transition-colors">Log in</Link>
             <Link href="/signup" className="text-sm font-medium bg-primary text-background px-4 py-2 rounded-sm hover:opacity-90 transition-opacity">Sign up</Link>
