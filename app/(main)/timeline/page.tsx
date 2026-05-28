@@ -14,6 +14,10 @@ export default function TimelinePage() {
   const [groupBy, setGroupBy] = useState<GroupBy>("month");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+
+  const handleEntryDeleted = (id: string) => {
+    setEntries((prev) => prev.filter((e) => e.id !== id));
+  };
   
   const fetchEntries = async (pageNum: number, isNewGroup: boolean = false) => {
     try {
@@ -123,7 +127,7 @@ export default function TimelinePage() {
                 
                 <div className="space-y-6">
                   {groupEntries.map((entry: any) => (
-                    <EntryCard 
+                    <EntryCard
                       key={entry.id}
                       id={entry.id}
                       title={entry.title}
@@ -132,6 +136,7 @@ export default function TimelinePage() {
                       mood={entry.mood}
                       journalName={entry.journal.name}
                       tags={entry.tags.map((t: any) => t.tag.name)}
+                      onDeleted={handleEntryDeleted}
                     />
                   ))}
                 </div>

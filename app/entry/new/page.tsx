@@ -4,11 +4,17 @@ import { prisma } from "../../../lib/prisma";
 import EntryEditor from "../../../components/editor/EntryEditor";
 import { Database } from "lucide-react";
 
-export default async function NewEntryPage() {
+interface NewEntryPageProps {
+  searchParams: Promise<{ journalId?: string }>;
+}
+
+export default async function NewEntryPage({ searchParams }: NewEntryPageProps) {
   const { userId } = await auth();
   if (!userId) {
     redirect("/login");
   }
+
+  const { journalId: journalIdParam } = await searchParams;
 
   try {
     const journals = await prisma.journal.findMany({
@@ -20,10 +26,14 @@ export default async function NewEntryPage() {
       where: { userId }
     });
 
+    // journalId from the URL takes priority over the user's default journal setting
+    const defaultJournalId =
+      journalIdParam ?? userSettings?.defaultJournalId ?? undefined;
+
     return (
       <EntryEditor 
         journals={journals} 
-        defaultJournalId={userSettings?.defaultJournalId || undefined} 
+        defaultJournalId={defaultJournalId}
       />
     );
   } catch (error) {
